@@ -1,0 +1,31 @@
+blueprint:
+  id: wax-player-churn-predictor
+  name: Player Churn Predictor
+  tier: gaming-retention
+  category: analytics
+  status: promoted
+  version: "0.5.0"
+  last_refined: "2026-10-18"
+
+metadata:
+  description: |
+    Educational retention-risk scoring from activity features.
+  related_blueprints:
+    - wax-temporal-behavior-heatmap
+    - wax-organic-activity-fingerprinter
+    - wax-behavioral-anomaly-detector
+
+invariants:
+  - Pure scoring
+  - Soft signal only
+
+features:
+  implemented:
+    - scoreChurnRisk, scoreCohort, demos, app page
+
+machine_instructions:
+  - Use examples/engines.ts
+  - Aggregate Hyperion at app edge into PlayerActivityProfile
+
+technical_requirements:
+  framework: Next.js + TypeScript
