@@ -14,6 +14,7 @@ type Mode = 'live' | 'risk' | 'active';
 export default function PlayerChurnPredictor() {
   const [mode, setMode] = useState<Mode>('live');
   const [account, setAccount] = useState('eosio');
+  const [origin, setOrigin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [liveResult, setLiveResult] = useState<ChurnRiskResult | null>(null);
@@ -33,7 +34,10 @@ export default function PlayerChurnPredictor() {
     setMeta(null);
     try {
       const { profile, source, rawCount, sampleNote } =
-        await fetchPlayerActivityProfile(account, { limit: 200 });
+        await fetchPlayerActivityProfile(account, {
+          limit: 200,
+          hyperionBase: origin.trim() || undefined,
+        });
       setLiveResult(scoreChurnRisk(profile));
       setMeta(`${rawCount} actions · ${sampleNote} · ${source}`);
     } catch (e) {
@@ -42,7 +46,7 @@ export default function PlayerChurnPredictor() {
     } finally {
       setLoading(false);
     }
-  }, [account]);
+  }, [account, origin]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white p-6">
@@ -91,6 +95,12 @@ export default function PlayerChurnPredictor() {
               onChange={(e) => setAccount(e.target.value)}
               className="flex-1 bg-black/60 border border-white/10 px-4 py-3 rounded-xl font-mono text-sm"
               placeholder="WAX account"
+            />
+            <input
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
+              className="flex-1 bg-black/60 border border-white/10 px-4 py-3 rounded-xl font-mono text-sm"
+              placeholder="Custom history origin (optional)"
             />
             <button
               type="button"

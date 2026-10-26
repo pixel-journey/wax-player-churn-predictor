@@ -4,8 +4,11 @@
  */
 
 import type { PlayerActivityProfile } from "../types";
+import { HISTORY_ORIGINS, actionsUrl } from "./origins";
 
+/** Kept so older notes can name it. get_actions on this host returned 404 on 2026-10-26. */
 export const DEFAULT_HYPERION = "https://wax.eosrio.io";
+export { HISTORY_ORIGINS };
 
 export interface HyperionActionRow {
   timestamp?: string;
@@ -33,29 +36,43 @@ export async function fetchAccountActionTimestamps(
     signal?: AbortSignal;
   } = {}
 ): Promise<{ timestamps: number[]; source: string; rawCount: number }> {
-  const base = (options.hyperionBase || DEFAULT_HYPERION).replace(/\/$/, "");
   const limit = options.limit ?? 200;
-  const name = account.trim().toLowerCase();
-  if (!name) throw new Error("Account required");
+  const custom = options.hyperionBase?.trim();
+  const order = custom ? [custom] : [...HISTORY_ORIGINS];
+  const errors: string[] = [];
 
-  const url = `${base}/v2/history/get_actions?account=${encodeURIComponent(
-    name
-  )}&limit=${limit}&sort=desc`;
-
-  const res = await fetch(url, {
-    signal: options.signal,
-    headers: { Accept: "application/json" },
-  });
-  if (!res.ok) throw new Error(`Hyperion ${res.status}: ${res.statusText}`);
-  const data = (await res.json()) as HyperionActionsResponse;
-  const rows = data.actions ?? [];
-  const timestamps: number[] = [];
-  for (const row of rows) {
-    const t = parseActionTimestamp(row);
-    if (t != null) timestamps.push(t);
+  for (const origin of order) {
+    const built = actionsUrl(origin, account, limit);
+    if (!built.ok) {
+      errors.push(built.reason);
+      if (custom) break;
+      continue;
+    }
+    try {
+      const res = await fetch(built.url, {
+        signal: options.signal,
+        headers: { Accept: "application/json" },
+      });
+      if (!res.ok) {
+        errors.push(`${origin} HTTP ${res.status}`);
+        continue;
+      }
+      const data = (await res.json()) as HyperionActionsResponse;
+      const rows = data.actions ?? [];
+      const timestamps: number[] = [];
+      for (const row of rows) {
+        const t = parseActionTimestamp(row);
+        if (t != null) timestamps.push(t);
+      }
+      timestamps.sort((a, b) => a - b);
+      return { timestamps, source: built.url, rawCount: rows.length };
+    } catch (error) {
+      if (options.signal?.aborted) throw error;
+      errors.push(`${origin} ${error instanceof Error ? error.message : "failed"}`);
+    }
   }
-  timestamps.sort((a, b) => a - b);
-  return { timestamps, source: url, rawCount: rows.length };
+
+  throw new Error(errors.join("; ") || "No history origin left");
 }
 
 /**
