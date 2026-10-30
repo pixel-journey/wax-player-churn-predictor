@@ -6,7 +6,9 @@ import {
   demoAtRiskProfile,
   scoreChurnRisk,
 } from '../examples/engines';
+import { downloadText, exportChurnMarkdown } from '../examples/exportReport';
 import { fetchPlayerActivityProfile } from '../examples/live/hyperion';
+import { CHURN_MYTHS } from '../examples/myths';
 import type { ChurnRiskResult } from '../examples/types';
 
 type Mode = 'live' | 'risk' | 'active';
@@ -17,6 +19,7 @@ export default function PlayerChurnPredictor() {
   const [origin, setOrigin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
   const [liveResult, setLiveResult] = useState<ChurnRiskResult | null>(null);
   const [meta, setMeta] = useState<string | null>(null);
 
@@ -54,9 +57,32 @@ export default function PlayerChurnPredictor() {
         <div className="text-2xl tracking-widest text-emerald-400 mb-2 font-bold">
           PLAYER CHURN PREDICTOR
         </div>
-        <div className="text-xs opacity-60 mb-6">
-          Pixel Journey · Live Hyperion sample or demo · Not a guaranteed forecast
+        <div className="text-xs opacity-60 mb-2">
+          Pixel Journey · educational-reference · soft retention risk
         </div>
+        <p className="text-xs opacity-50 mb-6 max-w-2xl">
+          Weighted heuristics only — not a guaranteed forecast. Live Hyperion is a
+          limited sample.
+        </p>
+
+        <section
+          className="rounded-2xl border border-fuchsia-500/25 bg-fuchsia-500/5 p-4 text-xs space-y-3 max-w-2xl mb-6"
+          aria-label="Myths"
+        >
+          <h2 className="text-sm font-semibold text-fuchsia-100">Myths vs reality</h2>
+          {CHURN_MYTHS.map((m) => (
+            <div key={m.myth}>
+              <p className="text-red-200/90">
+                <span className="opacity-60">Myth: </span>
+                {m.myth}
+              </p>
+              <p className="text-emerald-100/90 mt-0.5">
+                <span className="opacity-60">Reality: </span>
+                {m.reality}
+              </p>
+            </div>
+          ))}
+        </section>
 
         <div className="flex flex-wrap gap-2 mb-6">
           <button
@@ -118,6 +144,11 @@ export default function PlayerChurnPredictor() {
             {error}
           </div>
         )}
+        {status && (
+          <p className="mb-4 text-xs text-emerald-200/80" role="status">
+            {status}
+          </p>
+        )}
         {meta && (
           <div className="mb-4 text-xs opacity-50 break-all">{meta}</div>
         )}
@@ -153,6 +184,21 @@ export default function PlayerChurnPredictor() {
 
             <p className="text-xs opacity-60 mb-3">{result.methodologyNote}</p>
 
+            <button
+              type="button"
+              className="mb-4 px-3 py-2 text-xs rounded-lg bg-emerald-900"
+              onClick={() => {
+                downloadText(
+                  `${result.account}-churn.md`,
+                  exportChurnMarkdown(result),
+                  'text/markdown;charset=utf-8'
+                );
+                setStatus('Report downloaded');
+              }}
+            >
+              Download MD
+            </button>
+
             <ul className="space-y-1 text-xs opacity-80">
               {result.flags.map((f) => (
                 <li key={f.id}>
@@ -172,8 +218,7 @@ export default function PlayerChurnPredictor() {
 
         <p className="text-xs opacity-60">
           Live: Hyperion page → profile →{' '}
-          <code className="text-emerald-400/80">scoreChurnRisk</code>. Sample is not a
-          full 30-day archive.
+          <code className="text-emerald-400/80">scoreChurnRisk</code>. See POLICY.md.
         </p>
       </div>
     </div>
