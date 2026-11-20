@@ -50,6 +50,15 @@ Fixture labels `player_at_risk` / `player_active` are longer than 12 characters.
 | `http://` | not ok |
 | limit `201` | not ok |
 
+### Attack → test
+
+| Attack | Lab behavior |
+| --- | --- |
+| Treat 79 as critical | critical starts at **80** |
+| Call it a trained model | fixed weights only |
+| Use fixture labels as accounts | refused by name rules |
+| Message from score alone | soft signal only |
+
 ---
 
 ## Masterclass
@@ -62,9 +71,9 @@ Fixture labels `player_at_risk` / `player_active` are longer than 12 characters.
 
 ### Exercises
 
-1. Silent score and level? (79, high.)  
-2. Is 79 critical? (No.)  
-3. Cohort average of 79 and 8? (44.)
+1. Silent score and level? (**79, high**.)  
+2. Is 79 critical? (**No**.)  
+3. Cohort average of 79 and 8? (**44**.)
 
 ---
 
