@@ -1,16 +1,21 @@
 # wax-player-churn-predictor
 
-> **Trust label:** `educational-reference`  
-> **Status:** Engine + live + education pass (2026-10-30)
+Educational **retention-risk score** from activity features (recency, frequency drop, consistency, depth).
 
-Soft **retention-risk score** from activity features (recency · frequency drop · consistency · depth).
-
-Not a guaranteed forecast. The course is [EDUCATION.md](EDUCATION.md). The fixture labels are not Antelope names. Live Hyperion is not called by `npm test`.
+Fixed teaching weights only — not a trained model, not a Hyperion reader, and not authorization for outreach automation. Fixture labels used in tests are not Antelope account names.
 
 ```bash
 npm install && npm test && npm run dev
 ```
 
-[POLICY.md](./POLICY.md)
+| Doc | Role |
+| --- | --- |
+| [EDUCATION.md](./EDUCATION.md) | Weighted sum, bands, attack table |
+| [POLICY.md](./POLICY.md) | Scope boundaries |
+| [SECURITY.md](./SECURITY.md) | Soft-signal honesty |
+
+Related: [behavioral anomaly detector](https://github.com/pixel-journey/wax-behavioral-anomaly-detector).
+
+Official context: [docs.wax.io](https://docs.wax.io/).
 
 MIT — Pixel Journey
