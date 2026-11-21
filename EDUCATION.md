@@ -17,13 +17,17 @@ Official context: [docs.wax.io](https://docs.wax.io/).
 
 ## Beginner — one scene
 
-`critical` starts at **80**. The silent fixture lands at **79**, so it is `high`, not `critical`.
+A player who has been quiet for 18 days, with only one action in the last two weeks, two active days total, and no asset touches, scores **79**. That is `high`. It is not `critical`, because critical starts at 80.
+
+A player who has been active the whole time — 20 actions after 18, 14 active days, 12 touches — scores **8**, which is `low`.
+
+The average of those two scores is `round((79 + 8) / 2)` = **44**.
 
 | Fixture | Locked result |
 | --- | --- |
 | 18 days silent, 1 action after 14, 2 active days, 0 asset touches | score `79`, level `high`, flags `silent`, `sharp-drop`, `sparse` |
 | 0 days silent, 20 actions after 18, 14 active days, 12 touches | score `8`, level `low`, flag `healthy` |
-| both as a cohort | average `round((79 + 8) / 2)` = `44` |
+| both as a cohort | average `44` |
 
 ```bash
 npm test
